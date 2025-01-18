@@ -412,6 +412,19 @@ class FileGroup : VimFileBase() {
     return IjVimEditor(editor)
   }
 
+  override fun getEditor(number: Int, context: ExecutionContext): VimEditor? {
+    val project = PlatformDataKeys.PROJECT.getData((context as IjEditorExecutionContext).context) ?: return null
+    val fileEditorManager = FileEditorManagerEx.getInstanceEx(project)
+    val window = fileEditorManager.currentWindow
+    val editors = fileEditorManager.openFiles
+    if (window != null) {
+      if (number >= 0 && number < editors.size) {
+        return IjVimEditor(selectEditor(project, editors[number]) ?: return null)
+      }
+    }
+    return null
+  }
+
   override fun getProjectId(project: Any): String {
     require(project is Project)
     return project.name + "-" + project.locationHash
